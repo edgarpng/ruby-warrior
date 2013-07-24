@@ -2,11 +2,15 @@ require 'game'
 
 class Player
 
+  def initialize
+    @warrior = Game::Warrior.new
+  end
+
   def play_turn(turn)
     begin
-      warrior = Game::Warrior.new turn
-      warrior.kill_nearby_enemies
-      warrior.walk_towards_stairs
+      @warrior.play_turn turn
+      @warrior.attack_nearby_enemies || @warrior.rest
+      @warrior.walk_towards_stairs
     rescue
     end
   end
