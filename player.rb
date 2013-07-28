@@ -1,6 +1,7 @@
-require 'game'
+require 'warrior'
 
 class Player
+  attr_reader :warrior
 
   def initialize
     @warrior = Game::Warrior.new
@@ -8,10 +9,8 @@ class Player
 
   def play_turn(turn)
     begin
-      @warrior.play_turn turn
-      @warrior.attack_nearby_enemies || @warrior.rest
-      @warrior.walk_towards_stairs
-    rescue
+      warrior.update turn
+    rescue      
     end
   end
 end
