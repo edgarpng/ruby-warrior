@@ -17,7 +17,16 @@ module Game
 
     protected
     def strategy
-      look_around if (!enemies || enemies.empty?)
+      look_around
+      surrounded_strategy if surrounded?
+      rest if received_damage?
+      if found_captives?
+        rescue_captive captives.first
+      end
+      walk_to (objectives.first || stairs)
+    end
+
+    def surrounded_strategy
       unbound = enemies.unbound
       if unbound.size > 1
         bind unbound.first
@@ -25,8 +34,14 @@ module Game
       attack unbound.first
       rest if received_damage?
       attack enemies.bound.first
-      rescue_captive captives.first
-      walk_towards_stairs
+    end
+
+    def surrounded?
+      enemies && !enemies.empty?
+    end
+
+    def found_captives?
+      captives && !captives.empty?
     end
 
     def look_around
@@ -43,8 +58,20 @@ module Game
       end
     end
 
-    def walk_towards_stairs
-      turn.walk! turn.direction_of_stairs
+    def objectives
+      turn.listen
+    end
+
+    def walk_to(direction)
+      if direction.class == Symbol
+        turn.walk! direction
+      else
+        turn.walk! turn.direction_of(direction)
+      end
+    end
+
+    def stairs
+      turn.direction_of_stairs
     end
 
     def attack(enemy)
