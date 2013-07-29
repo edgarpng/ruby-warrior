@@ -17,13 +17,13 @@ module Game
 
     protected
     def strategy
-      look_around
+      look_around unless surrounded?
       surrounded_strategy if surrounded?
       rest if received_damage?
       if found_captives?
         rescue_captive captives.first
       end
-      walk_to (objectives.first || stairs)
+      walk_to next_objective || stairs
     end
 
     def surrounded_strategy
@@ -58,16 +58,22 @@ module Game
       end
     end
 
-    def objectives
-      turn.listen
+    def next_objective
+      next_obj = turn.listen.first
+      return unless next_obj
+      next_direction = turn.direction_of next_obj
+      if turn.feel(next_direction).stairs?
+        empty_directions = DIRECTIONS.select do |dir|
+          turn.feel(dir).empty?
+        end
+        empty_directions.first
+      else
+        next_direction
+      end
     end
 
     def walk_to(direction)
-      if direction.class == Symbol
-        turn.walk! direction
-      else
-        turn.walk! turn.direction_of(direction)
-      end
+      turn.walk! direction
     end
 
     def stairs

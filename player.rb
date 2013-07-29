@@ -10,7 +10,7 @@ class Player
   def play_turn(turn)
     begin
       warrior.update turn
-    rescue      
+    rescue
     end
   end
 end
