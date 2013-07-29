@@ -12,17 +12,17 @@ module Game
 
     def update(t)
       @turn = t
-      look_around if (!enemies || enemies.empty?)
       strategy()
     end
 
     protected
     def strategy
+      look_around if (!enemies || enemies.empty?)
       unbound = enemies.unbound
       if unbound.size > 1
-        bind enemies.unbound.first
+        bind unbound.first
       end
-      attack enemies.unbound.first
+      attack unbound.first
       rest if received_damage?
       attack enemies.bound.first
       rescue_captive captives.first
