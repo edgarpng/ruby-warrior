@@ -1,5 +1,9 @@
 module Game
-  module Wrappers
+  module Utils
+    # Proxy class to represent an Array of Enemy instances.
+    # Adds two metods to filter the state of the enemies: 
+    #   +bound
+    #   +unbound
     class EnemyArray
       def initialize
         @enemies = []

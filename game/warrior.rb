@@ -1,21 +1,32 @@
-require 'enemy'
-require 'enemy_array'
-require 'captive'
+require 'game/enemy'
+require 'game/captive'
+require 'game/utils/enemy_array'
 
 module Game
   DIRECTIONS = [:left, :right, :forward, :backward]
 
+  # Contains the main strategies and actions a warrior can take.
+  # It keeps the state of the turns played, allowing it to react
+  # to health damage. In addition, it keeps track of enemies and
+  # captives in its immediate sorroundings.
+  # TODO: This class is huge. Separate methods into smaller
+  # classes.
   class Warrior
     attr_reader :turn
     attr_accessor :enemies, :captives, :last_attack
     MAX_HEALTH = 20
 
+    # Updates logic and state of the warrior. Must be called on
+    # each turn.
     def update(t)
       @turn = t
       strategy()
     end
 
     protected
+    # Defines important things the warrior must do in a given turn,
+    # sorted by order of priority (it can only take one action per
+    # turn)
     def strategy
       look_around unless surrounded?
       surrounded_strategy if surrounded?
@@ -26,6 +37,7 @@ module Game
       walk_to next_objective || stairs
     end
 
+    # Defines what to do if there are enemies on every direction
     def surrounded_strategy
       unbound = enemies.unbound
       if unbound.size > 1
@@ -44,9 +56,11 @@ module Game
       captives && !captives.empty?
     end
 
+    # Senses each direction, storing enemies found to deal with
+    # them later if necessary
     def look_around
       @captives = []
-      @enemies = Wrappers::EnemyArray.new
+      @enemies = Utils::EnemyArray.new
       
       DIRECTIONS.each do |direction|
         space = turn.feel direction
@@ -58,6 +72,8 @@ module Game
       end
     end
 
+    # Decides where the next objective is, which could be a slug or a
+    # captive
     def next_objective
       next_obj = turn.listen.first
       return unless next_obj
